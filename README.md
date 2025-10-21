@@ -49,7 +49,7 @@ sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 ```
 
-2. Install the nvidia-container-toolkit using the [instructions](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#installing-with-apt).
+2. Install the nvidia-container-toolkit using the [instructions](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#installing-with-apt) or execute below commands:
 
 ```bash
 sudo apt-get update && apt-get install -y --no-install-recommends \
@@ -128,13 +128,13 @@ ln -s ~/workspaces/aici_gmbh_robotics_ws/docker/.isaac_ros_common-config ~/.isaa
 7. Setup the dev convenience script.
 
 ```bash
-sudo ln -s ~/workspaces/aici_gmbh_robotics_ws/docker/startup/srd_dev_startup.sh ~/srd_dev_startup.sh
+sudo ln -s ~/workspaces/aici_gmbh_robotics_ws/docker/startup/aici_dev_startup.sh ~/aici_dev_startup.sh
 ```
 
 8. Build and run the docker image using the dev script. Check the [Isaac ROS Common Docs](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_common/index.html) for more information.
 
 ```bash
-~/srd_dev_startup.sh
+~/aici_dev_startup.sh
 ```
 
 ## Development
@@ -142,7 +142,7 @@ sudo ln -s ~/workspaces/aici_gmbh_robotics_ws/docker/startup/srd_dev_startup.sh 
 1. To Launch the dev container, run this command:
 
 ```bash
-~/srd_dev_startup.sh -b
+~/aici_dev_startup.sh -b
 ```
 
 2. To Stop the running container, use this command:
@@ -151,7 +151,7 @@ sudo ln -s ~/workspaces/aici_gmbh_robotics_ws/docker/startup/srd_dev_startup.sh 
 docker stop isaac_ros_dev-${PLATFORM}-container
 ```
 
-> [!NOTE] 
+> [!NOTE]
 >
 > The `-b` flag will omit rebuilding the docker image and use the existing one.
 
