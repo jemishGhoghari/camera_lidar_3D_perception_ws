@@ -113,10 +113,11 @@ mkdir ~/workspaces && cd ~/workspaces
 git clone git@github.com:jemishGhoghari/aici_gmbh_robotics_ws.git
 ```
 
-5. Navigate to workspace dir.
+5. Navigate to workspace dir & update submodules.
 
 ```bash
 cd ~/workspaces/aici_gmbh_robotics_ws
+git submodule update --init --recursive
 ```
 
 6. Link the config for the additional custom [Isaac ROS Development Environment](https://nvidia-isaac-ros.github.io/concepts/docker_devenv/index.html) image layer.
