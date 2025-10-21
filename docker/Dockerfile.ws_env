@@ -1,0 +1,59 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+
+RUN apt-get clean
+RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /usr/share/keyrings/kitware-archive-keyring.gpg >/dev/null
+
+# store apt-get packages in the docker cache so they won't need to be re-downloaded
+RUN --mount=target=/var/lib/apt/lists,type=cache,sharing=locked \
+    --mount=target=/var/cache/apt,type=cache,sharing=locked \
+    rm -f /etc/apt/apt.conf.d/docker-clean \
+    && apt-get update
+
+# fix issues with ament_find_gmock
+RUN --mount=type=cache,target=/var/cache/apt \
+    apt-get update && rm -f /usr/src/gmock \
+    && apt-get install -y \
+    ros-humble-gmock-vendor \
+    ros-humble-gtest-vendor
+
+# install missing ros2 packages
+RUN --mount=type=cache,target=/var/cache/apt \
+    apt-get update && apt-get install -y \
+    ros-humble-can-msgs \
+    ros-humble-ros2-socketcan \
+    ros-humble-ros2-control \
+    ros-humble-ros2-controllers \
+    ros-humble-robot-localization \
+    ros-humble-rqt-common-plugins \
+    ros-humble-rqt-image-overlay \
+    ros-humble-image-pipeline \
+    ros-humble-xacro \
+    ros-humble-teleop-twist-keyboard \
+    ros-humble-teleop-twist-joy \
+    ros-humble-twist-stamper \
+    ros-humble-magic-enum \
+    ros-humble-joint-state-publisher-gui \
+    ros-humble-joint-state-publisher \
+    ros-humble-rosbag2-storage-mcap \
+    ros-humble-derived-object-msgs
+
+# install isaac ros packages
+RUN --mount=type=cache,target=/var/cache/apt \
+    apt-get update && apt-get install -y \
+    ros-humble-isaac-ros-yolov8 \
+    ros-humble-isaac-ros-h264-encoder \
+    ros-humble-isaac-ros-h264-decoder \
+    ros-humble-isaac-ros-image-pipeline \
+    ros-humble-isaac-ros-argus-camera \
+    ros-humble-isaac-ros-jetson-stats
+
+# install gdb
+RUN --mount=type=cache,target=/var/cache/apt \
+    apt-get update && apt-get install -y \
+    gdb
+
+# copy entrypoint scripts
+RUN mkdir -p /usr/local/bin/scripts/entrypoint_additions
+COPY scripts/entrypoint_additions/*.sh /usr/local/bin/scripts/entrypoint_additions/
+RUN chmod +x /usr/local/bin/scripts/entrypoint_additions/*.sh || true
