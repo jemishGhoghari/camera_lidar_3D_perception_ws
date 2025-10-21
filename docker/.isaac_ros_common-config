@@ -1,0 +1,2 @@
+CONFIG_IMAGE_KEY=ros2_humble.ws_env
+CONFIG_DOCKER_SEARCH_DIRS=$HOME/workspaces/aici_gmbh_robotics_ws/docker
