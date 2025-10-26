@@ -122,11 +122,6 @@ def generate_launch_description():
             default_value='True',
             description='The flag to set whether to use CUDA based DNN or not',
         ),
-        DeclareLaunchArgument(
-            'image_transport',
-            default_value='raw',
-            description='Use raw or compressed image',
-        ),
     ]
 
     return LaunchDescription(launch_args + [OpaqueFunction(function=launch_setup)])
