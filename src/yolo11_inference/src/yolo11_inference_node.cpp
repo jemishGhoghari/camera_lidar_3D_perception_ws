@@ -21,6 +21,7 @@ Yolo11InferenceNode::Yolo11InferenceNode(const rclcpp::NodeOptions& options) : N
   // Publishers
   detection_pub_ = this->create_publisher<vision_msgs::msg::Detection2DArray>("detections", 10);
 
+  // Subscribers
   image_sub_ = this->create_subscription<sensor_msgs::msg::CompressedImage>(
       "image_raw", rclcpp::SensorDataQoS(),
       std::bind(&Yolo11InferenceNode::imageCallback, this, std::placeholders::_1));
@@ -81,7 +82,7 @@ void Yolo11InferenceNode::imageCallback(const sensor_msgs::msg::CompressedImage:
     det_array.detections.push_back(det);
   }
 
-  detection_pub_->publish(det_array);
+  detection_pub_->publish(std::move(det_array));
 }
 
 }  // namespace yolo11_inference
