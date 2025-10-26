@@ -5,5 +5,7 @@ source /opt/ros/${ROS_DISTRO}/setup.bash
 source ${ISAAC_ROS_WS}/install/setup.bash
 export RCUTILS_COLORIZED_OUTPUT=1
 
+export OpenCV_DIR=/usr/local/lib/cmake/opencv4/
+
 # colcon command completion for bash
 source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash
