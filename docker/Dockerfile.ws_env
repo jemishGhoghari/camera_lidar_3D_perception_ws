@@ -1,6 +1,10 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
+ARG OPENCV_VERSION=4.12.0
+# Set GPU architectures as needed, or remove to let CMake choose
+ARG CMAKE_CUDA_ARCHITECTURES="86;89;90"
+
 RUN apt-get clean
 RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /usr/share/keyrings/kitware-archive-keyring.gpg >/dev/null
 
@@ -52,6 +56,52 @@ RUN --mount=type=cache,target=/var/cache/apt \
 RUN --mount=type=cache,target=/var/cache/apt \
     apt-get update && apt-get install -y \
     gdb
+
+RUN --mount=type=cache,target=/var/cache/apt \
+    apt-get update && apt-get install -y \
+    libgtk-3-dev libeigen3-dev libtbb-dev \
+    libjpeg-dev libpng-dev libtiff-dev \
+    libavcodec-dev libavformat-dev libswscale-dev \
+    libdc1394-dev libopenexr-dev libv4l-dev \
+    libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+    libgl1-mesa-dev libglu1-mesa-dev \
+    zlib1g-dev libzstd-dev
+
+WORKDIR /opt
+RUN git clone --branch ${OPENCV_VERSION} --depth 1 https://github.com/opencv/opencv.git && \
+    git clone --branch ${OPENCV_VERSION} --depth 1 https://github.com/opencv/opencv_contrib.git
+
+WORKDIR /opt/opencv/build
+RUN cmake -S .. -B . \
+    -D CMAKE_BUILD_TYPE=Release \
+    -D CMAKE_INSTALL_PREFIX=/usr/local \
+    -D OPENCV_EXTRA_MODULES_PATH=/opt/opencv_contrib/modules \
+    -D BUILD_opencv_sfm=OFF \
+    -D OPENCV_GENERATE_PKGCONFIG=ON \
+    -D OPENCV_PC_FILE_NAME=opencv4.pc \
+    -D WITH_TBB=ON \
+    -D WITH_CUDA=ON \
+    -D WITH_CUDNN=ON \
+    -D OPENCV_DNN_CUDA=ON \
+    -D WITH_GSTREAMER=ON \
+    -D WITH_V4L=ON \
+    -D WITH_GTK=ON \
+    -D WITH_QT=OFF \
+    -D WITH_OPENGL=ON \
+    -D WITH_1394=ON \
+    -D ENABLE_FAST_MATH=ON \
+    -D CUDA_FAST_MATH=ON \
+    -D BUILD_EXAMPLES=OFF \
+    -D BUILD_TESTS=OFF \
+    -D BUILD_PERF_TESTS=OFF \
+    -D BUILD_JAVA=OFF \
+    -D BUILD_opencv_highgui=ON \
+    -D BUILD_opencv_dnn=ON \
+    -D CMAKE_CUDA_ARCHITECTURES="${CMAKE_CUDA_ARCHITECTURES}" \
+ && cmake --build . --config Release -j"$(nproc)" \
+ && cmake --install . --prefix /usr/local
+
+RUN ldconfig
 
 # copy entrypoint scripts
 RUN mkdir -p /usr/local/bin/scripts/entrypoint_additions
