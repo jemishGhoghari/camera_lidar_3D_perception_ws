@@ -20,10 +20,6 @@ CameraLidarPerceptionNode::CameraLidarPerceptionNode(const rclcpp::NodeOptions& 
   // Publishers
   detection_3d_pub_ = this->create_publisher<vision_msgs::msg::Detection3DArray>("detections_3d", 10);
 
-  // detection_2d_sub_ = this->create_subscription<vision_msgs::msg::Detection2DArray>(
-  //     "detections", rclcpp::SensorDataQoS(),
-  //     std::bind(&CameraLidarPerceptionNode::detection2DCallback, this, std::placeholders::_1));
-
   RCLCPP_INFO(this->get_logger(), "Camera LiDAR Node has been initialized");
 }
 
