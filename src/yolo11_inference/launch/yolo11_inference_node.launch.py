@@ -18,7 +18,6 @@ def launch_setup(context, *args, **kwargs):
     confidence_threshold = LaunchConfiguration('confidence_threshold')
     nms_threshold = LaunchConfiguration('nms_threshold')
     use_cuda = LaunchConfiguration('use_cuda')
-    image_transport = LaunchConfiguration('image_transport')
 
     classes_config = PathJoinSubstitution(
         [FindPackageShare('yolo11_inference'), 'config', 'params.yaml']
@@ -47,7 +46,6 @@ def launch_setup(context, *args, **kwargs):
                 'confidence_threshold' : confidence_threshold,
                 'nms_threshold' : nms_threshold,
                 'use_cuda' : use_cuda,
-                'image_transport' : image_transport
             }
         ],
         remappings=[
