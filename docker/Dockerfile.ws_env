@@ -40,7 +40,9 @@ RUN --mount=type=cache,target=/var/cache/apt \
     ros-humble-joint-state-publisher-gui \
     ros-humble-joint-state-publisher \
     ros-humble-rosbag2-storage-mcap \
-    ros-humble-derived-object-msgs
+    ros-humble-derived-object-msgs \
+    ros-humble-pcl-conversions \
+    ros-humble-pcl-ros
 
 # install isaac ros packages
 RUN --mount=type=cache,target=/var/cache/apt \
