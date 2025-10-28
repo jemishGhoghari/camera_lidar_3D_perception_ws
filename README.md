@@ -1,4 +1,4 @@
-# AICI GmbH - ROS2 Development Workspace
+# ROS2 Development Workspace
 
 This repository contains all packages that form the entire software stack of the ACU.
 
