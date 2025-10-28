@@ -2,7 +2,6 @@
 #define CAMERA_LIDAR_PERCEPTION_NODE_HPP
 
 #include <rclcpp/rclcpp.hpp>
-#include "camera_lidar_3d_perception/camera_lidar_perception_node.hpp"
 
 #include <vision_msgs/msg/detection3_d_array.hpp>
 #include <vision_msgs/msg/detection2_d_array.hpp>
@@ -11,9 +10,16 @@
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <std_msgs/msg/header.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
+#include <geometry_msgs/msg/transform_stamped.hpp>
 
 #include <message_filters/subscriber.h>
 #include <message_filters/sync_policies/approximate_time.h>
+
+#include <tf2_ros/buffer.hpp>
+#include <tf2_ros/transform_listener.hpp>
+#include <tf2_eigen/tf2_eigen.hpp>
+
+#include <cv_bridge/cv_bridge.h>
 
 #include <Eigen/Dense>
 #include <pcl/common/common.h>
@@ -23,6 +29,9 @@
 #include <pcl/point_cloud.h>
 #include <pcl/search/kdtree.h>
 #include <pcl/segmentation/extract_clusters.h>
+#include <pcl_conversions/pcl_conversions.h>
+
+using namespace std::chrono_literals;
 
 typedef message_filters::sync_policies::ApproximateTime<
     sensor_msgs::msg::PointCloud2, vision_msgs::msg::Detection2DArray, sensor_msgs::msg::CameraInfo>
@@ -70,9 +79,8 @@ public:
    * @param cloud_out Output point cloud in the camera frame.
    * @param transform Transformation matrix from LiDAR to camera frame.
    */
-  void transformPointCloudToCameraFrame(const pcl::PointCloud<pcl::PointXYZ>::Ptr& cloud_in,
-                                        pcl::PointCloud<pcl::PointXYZ>::Ptr& cloud_out,
-                                        const Eigen::Affine3f& transform);
+  void transformPointCloud(const pcl::PointCloud<pcl::PointXYZ>::Ptr& cloud_in,
+                           pcl::PointCloud<pcl::PointXYZ>::Ptr& cloud_out, const Eigen::Affine3f& transform);
 
   /**
    * @brief Projects a point cloud onto the camera image plane and associates it with 2D detections.
@@ -84,6 +92,7 @@ public:
    */
   void projectCloud(const pcl::PointCloud<pcl::PointXYZ>::Ptr& point_cloud,
                     const vision_msgs::msg::Detection2DArray::ConstSharedPtr& yolo_detections_msg,
+                    const sensor_msgs::msg::CameraInfo::ConstSharedPtr& camera_info_msg,
                     const std_msgs::msg::Header& header, vision_msgs::msg::Detection3DArray& detection3d_array_msg,
                     sensor_msgs::msg::PointCloud2& combine_detection_cloud_msg);
 
@@ -95,6 +104,7 @@ public:
    */
   void processPointsWithBbox(const pcl::PointCloud<pcl::PointXYZ>::Ptr& cloud,
                              const vision_msgs::msg::Detection2D& detection2d_msg,
+                             const sensor_msgs::msg::CameraInfo::ConstSharedPtr& camera_info,
                              pcl::PointCloud<pcl::PointXYZ>::Ptr& raw_detection_cloud);
 
   /**
@@ -135,6 +145,9 @@ public:
    */
   pcl::PointCloud<pcl::PointXYZ>::Ptr eucludianClustering(const pcl::PointCloud<pcl::PointXYZ>::Ptr& cloud);
 
+  bool project3DToPixelRectified(const sensor_msgs::msg::CameraInfo::ConstSharedPtr& cam_info_msg,
+                                 const cv::Point3d& points3d, cv::Point2d& u_v);
+
   /**
    * @brief Creates a MarkerArray message for visualizing 3D detections in RViz OR Optionally Foxglove Studio.
    * @param detection3d_array_msg Input 3D detections message.
@@ -169,6 +182,17 @@ private:
    * @brief Publisher for Detection3DArray messages.
    */
   rclcpp::Publisher<vision_msgs::msg::Detection3DArray>::SharedPtr detection_3d_pub_;
+
+  std::shared_ptr<tf2_ros::Buffer> tf2_buffer_;
+
+  std::shared_ptr<tf2_ros::TransformListener> tf2_listener_;
+
+  rclcpp::Time last_callback_time_;
+
+  float voxel_leaf_size_;
+  float cluster_tolerance_;
+  float min_cluster_size_;
+  float max_cluster_size_;
 };
 
 }  // namespace camera_lidar_3d_perception
