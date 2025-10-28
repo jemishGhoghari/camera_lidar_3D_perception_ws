@@ -60,3 +60,41 @@ Enable with visualize:=true on the bringup launch.
 ## Examples
 
 - ros2 launch camera_lidar_perception_bringup camera_lidar_perception_bringup.launch.py map_environment:=bathroom visualize:=true
+
+## Occupancy Grid Generator
+The Occupancy Grid Generator generates the 3D bounding box overlay on the raw images. It uses the nav2_map_server to load the static map and the camera_lidar_3d_perception package to create overlay.
+It also writes the JSON file with all detected objects with pose, hypothesis, class_id and timestamp.
+
+The example JSON format look like below:
+```bash
+{
+  "frame_id": "map",
+  "detections": [
+    {
+      "id": "obj_id",
+      "class": "class_id",
+      "pose": {
+        "x": x_pos,
+        "y": y_pos,
+        "yaw": z_pos
+      },
+      "dimensions": {
+        "length": length,
+        "width": width
+      },
+      "confidence": confidence,
+      "count": count
+    }
+  ]
+}
+```
+
+### Usage
+```bash
+ros2 run camera_lidar_perception_bringup ocp_generator.py
+```
+
+In order to generate the 
+
+Note: The default parameters are set to comply with the current setup, so you do not need to override parameters.
+
