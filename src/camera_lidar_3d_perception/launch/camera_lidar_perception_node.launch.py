@@ -23,6 +23,8 @@ def launch_setup(context, *args, **kwargs):
     cluster_tolerance = LaunchConfiguration("cluster_tolerance")
     min_cluster_size = LaunchConfiguration("min_cluster_size")
     max_cluster_size = LaunchConfiguration("max_cluster_size")
+    camera_optical_frame = LaunchConfiguration("camera_optical_frame")
+    target_frame = LaunchConfiguration("target_frame")
 
     component_container = ComposableNodeContainer(
         package="rclcpp_components",
@@ -44,6 +46,8 @@ def launch_setup(context, *args, **kwargs):
                 "cluster_tolerance": cluster_tolerance,
                 "min_cluster_size": min_cluster_size,
                 "max_cluster_size": max_cluster_size,
+                "camera_optical_frame": camera_optical_frame,
+                "target_frame": target_frame,
             }
         ],
         remappings=[
@@ -119,6 +123,16 @@ def generate_launch_description():
             "max_cluster_size",
             default_value="25000",
             description="The maximum size of a cluster to be considered valid",
+        ),
+        DeclareLaunchArgument(
+            "camera_optical_frame",
+            default_value="zed_left_camera_optical_frame",
+            description="The camera optical frame",
+        ),
+        DeclareLaunchArgument(
+            "target_frame",
+            default_value="map",
+            description="The Target frame in which 3D detections trandformed to",
         ),
     ]
 
