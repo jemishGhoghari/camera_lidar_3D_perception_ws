@@ -141,7 +141,7 @@ ln -s ~/workspaces/camera_lidar_3D_perception_ws/docker/.isaac_ros_common-config
 7. Setup the dev convenience script.
 
 ```bash
-sudo ln -s ~/workspaces/camera_lidar_3D_perception_ws/docker/startup/aici_dev_startup.sh ~/aici_dev_startup.sh
+sudo ln -s ~/workspaces/camera_lidar_3D_perception_ws/docker/startup/ros_dev_startup.sh ~/ros_dev_startup.sh
 ```
 
 8. Build and run the docker image using the dev script. Check the [Isaac ROS Common Docs](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_common/index.html) for more information.
