@@ -99,9 +99,11 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
             "detection_2d_input_topic": "detections",
             "detections_3d_output_topic": "/detections_3d",
             "voxel_leaf_size": "0.1",
-            "cluster_tolerance": "0.1",
+            "cluster_tolerance": "0.2",
             "min_cluster_size": "10",
             "max_cluster_size": "25000",
+            "camera_optical_frame": "zed_left_camera_optical_frame",
+            "target_frame": "map",
         }.items(),
     )
 
