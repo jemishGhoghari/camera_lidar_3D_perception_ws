@@ -188,7 +188,9 @@ private:
   std::shared_ptr<tf2_ros::TransformListener> tf2_listener_;
 
   rclcpp::Time last_callback_time_;
-
+   
+  std::string camera_optical_frame_;
+  std::string target_frame_;
   float voxel_leaf_size_;
   float cluster_tolerance_;
   float min_cluster_size_;
