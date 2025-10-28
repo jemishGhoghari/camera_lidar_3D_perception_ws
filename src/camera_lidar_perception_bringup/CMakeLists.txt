@@ -10,7 +10,7 @@ find_package(ament_cmake_auto REQUIRED)
 
 install(
   PROGRAMS
-    script/overlay_exporter.py
+    script/ocp_generator.py
   DESTINATION lib/camera_lidar_perception_bringup
 )
 
