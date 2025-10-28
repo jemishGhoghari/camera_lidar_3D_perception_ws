@@ -68,29 +68,34 @@ source install/setup.bash
 ```
 
 ---
+
 # Launch & Usage
 
 ## Launch Arguments
-| Name                       | Default                           | Description                                   |
-|---------------------------|-----------------------------------|-----------------------------------------------|
-| component_container_name  | camera_lidar_perception_container | Target container name                          |
-| standalone                | True                              | Create a container and load the node if True  |
-| pointcloud_topic          | pointcloud                        | LiDAR PointCloud2 input                        |
-| detection_2d_input_topic  | detections                        | 2D detections input                            |
-| detections_3d_output_topic| detections_3d                     | 3D detections output                           |
-| camera_info_topic         | camera_info                        | Camera intrinsics input                         |
-| voxel_leaf_size           | 0.1                               | Voxel grid size                                |
-| cluster_tolerance         | 0.1                               | Clustering tolerance                           |
-| min_cluster_size          | 10                                | Minimum cluster size                            |
-| max_cluster_size          | 25000                             | Maximum cluster size                            |
+
+| Name                       | Default                           | Description                                  |
+| -------------------------- | --------------------------------- | -------------------------------------------- |
+| component_container_name   | camera_lidar_perception_container | Target container name                        |
+| standalone                 | True                              | Create a container and load the node if True |
+| pointcloud_topic           | pointcloud                        | LiDAR PointCloud2 input                      |
+| detection_2d_input_topic   | detections                        | 2D detections input                          |
+| detections_3d_output_topic | detections_3d                     | 3D detections output                         |
+| camera_info_topic          | camera_info                       | Camera intrinsics input                      |
+| voxel_leaf_size            | 0.1                               | Voxel grid size                              |
+| cluster_tolerance          | 0.1                               | Clustering tolerance                         |
+| min_cluster_size           | 10                                | Minimum cluster size                         |
+| max_cluster_size           | 25000                             | Maximum cluster size                         |
 
 ## Default(Standalone container):
 
 start a multithreaded component container and load the node:
+
 ```bash
 ros2 launch camera_lidar_3d_perception camera_lidar_perception_node.launch.py
 ```
+
 ## Common overrides:
+
 ```bash
 # Parameter overrides
 ros2 launch camera_lidar_3d_perception camera_lidar_perception_node.launch.py \
@@ -99,7 +104,9 @@ ros2 launch camera_lidar_3d_perception camera_lidar_perception_node.launch.py \
     min_cluster_size:=10 \
     max_cluster_size:=25000 \
 ```
+
 ---
+
 ```bash
 # Topic remapping
 ros2 launch camera_lidar_3d_perception camera_lidar_perception_node.launch.py \
@@ -108,16 +115,21 @@ ros2 launch camera_lidar_3d_perception camera_lidar_perception_node.launch.py \
   camera_info_topic:=/zed/zed_node/rgb/camera_info \
   detections_3d_output_topic:=/perception/detections_3d
 ```
+
 ---
+
 ## Load into existing component container:
+
 ```bash
 ros2 launch camera_lidar_3d_perception camera_lidar_perception_node.launch.py \
   component_container_name:=<your_container_name> \
   standalone:=false
 ```
+
 ---
 
 # Dependencies
+
 - rclcpp
 - rclcpp_components
 - sensor_msgs
