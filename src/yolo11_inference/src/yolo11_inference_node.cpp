@@ -1,4 +1,4 @@
-#include <yolo11_inference/yolo11_inference_node.hpp>
+#include "yolo11_inference/yolo11_inference_node.hpp"
 
 namespace yolo11_inference
 {
