@@ -16,8 +16,20 @@ This repository contains all packages that form the entire software stack of the
 <td></td>
 </tr>
 <tr>
-<td> multi_sensor_object_mapping</td>
-<td>Camera detections and LiDAR based 3D Object detection</td>
+<td> yolo11_inference</td>
+<td>Camera detections pkg using Yolo11 model and OpenCV DNN</td>
+</tr>
+<tr>
+<td> camera_lidar_perception_bringup</td>
+<td>Camera and LiDAR fusion for 3D Detection</td>
+</tr>
+<tr>
+<td> camera_lidar_perception_bringup</td>
+<td>made for easy launching of the camera LiDAR perception nodes</td>
+</tr>
+<tr>
+<td> isaac_ros_common</td>
+<td>NVIDIA Isaac ROS dev container for seamless robotics development</td>
 </tr>
 </table>
 
@@ -110,32 +122,32 @@ git lfs install --skip-repo
 
 ```bash
 mkdir ~/workspaces && cd ~/workspaces
-git clone git@github.com:jemishGhoghari/aici_gmbh_robotics_ws.git
+git clone https://github.com/jemishGhoghari/camera_lidar_3D_perception_ws.git
 ```
 
 5. Navigate to workspace dir & update submodules.
 
 ```bash
-cd ~/workspaces/aici_gmbh_robotics_ws
+cd ~/workspaces/camera_lidar_3D_perception_ws
 git submodule update --init --recursive
 ```
 
 6. Link the config for the additional custom [Isaac ROS Development Environment](https://nvidia-isaac-ros.github.io/concepts/docker_devenv/index.html) image layer.
 
 ```bash
-ln -s ~/workspaces/aici_gmbh_robotics_ws/docker/.isaac_ros_common-config ~/.isaac_ros_common-config
+ln -s ~/workspaces/camera_lidar_3D_perception_ws/docker/.isaac_ros_common-config ~/.isaac_ros_common-config
 ```
 
 7. Setup the dev convenience script.
 
 ```bash
-sudo ln -s ~/workspaces/aici_gmbh_robotics_ws/docker/startup/aici_dev_startup.sh ~/aici_dev_startup.sh
+sudo ln -s ~/workspaces/camera_lidar_3D_perception_ws/docker/startup/aici_dev_startup.sh ~/aici_dev_startup.sh
 ```
 
 8. Build and run the docker image using the dev script. Check the [Isaac ROS Common Docs](https://nvidia-isaac-ros.github.io/repositories_and_packages/isaac_ros_common/index.html) for more information.
 
 ```bash
-~/aici_dev_startup.sh
+~/ros_dev_startup.sh
 ```
 
 ## Development
@@ -143,7 +155,7 @@ sudo ln -s ~/workspaces/aici_gmbh_robotics_ws/docker/startup/aici_dev_startup.sh
 1. To Launch the dev container, run this command:
 
 ```bash
-~/aici_dev_startup.sh -b
+~/ros_dev_startup.sh -b
 ```
 
 2. To Stop the running container, use this command:
