@@ -1,3 +1,3 @@
 /**:
   ros__parameters:
-    class_names: ["couch", "dining table", "chair", "potted plant", "bench"]
+    class_names: ["couch", "dining table", "potted plant", "bench", "backpack", "vase", "toilet", "sink"]
