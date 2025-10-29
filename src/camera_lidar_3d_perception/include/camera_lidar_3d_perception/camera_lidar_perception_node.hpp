@@ -183,6 +183,8 @@ private:
    */
   rclcpp::Publisher<vision_msgs::msg::Detection3DArray>::SharedPtr detection_3d_pub_;
 
+  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_array_pub_;
+
   std::shared_ptr<tf2_ros::Buffer> tf2_buffer_;
 
   std::shared_ptr<tf2_ros::TransformListener> tf2_listener_;
