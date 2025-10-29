@@ -62,39 +62,27 @@ Enable with visualize:=true on the bringup launch.
 - ros2 launch camera_lidar_perception_bringup camera_lidar_perception_bringup.launch.py map_environment:=bathroom visualize:=true
 
 ## Occupancy Grid Generator
-The Occupancy Grid Generator generates the 3D bounding box overlay on the raw images. It uses the nav2_map_server to load the static map and the camera_lidar_3d_perception package to create overlay.
-It also writes the JSON file with all detected objects with pose, hypothesis, class_id and timestamp.
+This package includes ocp_generator.py, a helper node that projects the top surfaces of 3D detections onto the Occupancy Grid Map and saves the result as a PNG image.
 
-The example JSON format look like below:
+### Usage:
 ```bash
-{
-  "frame_id": "map",
-  "detections": [
-    {
-      "id": "obj_id",
-      "class": "class_id",
-      "pose": {
-        "x": x_pos,
-        "y": y_pos,
-        "yaw": z_pos
-      },
-      "dimensions": {
-        "length": length,
-        "width": width
-      },
-      "confidence": confidence,
-      "count": count
-    }
-  ]
-}
+ros2 run camera_lidar_perception_bringup ocp_generator.py --ros-args -p output_dir:=<output_directory> -p map_yaml_file:=<path_to_map_yaml>
 ```
-
-### Usage
 ```bash
-ros2 run camera_lidar_perception_bringup ocp_generator.py
+ros2 service call /render_detections_on_occupancy_map std_srvs/srv/Trigger {}
 ```
+### Inputs:
 
-In order to generate the 
+- Subscribes: /detections_3d (vision_msgs/Detection3DArray, in map frame)
 
-Note: The default parameters are set to comply with the current setup, so you do not need to override parameters.
+- Uses map from: /nav2/map_server/map
 
+### Behavior:
+
+- Accumulates detections over time
+
+- Selects best box per class (highest score)
+
+- Prevents overlapping boxes
+
+- Saves rendered occupancy grid with boxes as PNG
