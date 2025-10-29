@@ -98,10 +98,10 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
             "camera_info_topic": "/zed/zed_node/rgb/camera_info",
             "detection_2d_input_topic": "detections",
             "detections_3d_output_topic": "/detections_3d",
-            "voxel_leaf_size": "0.1",
-            "cluster_tolerance": "0.2",
-            "min_cluster_size": "10",
-            "max_cluster_size": "25000",
+            "voxel_leaf_size": "0.01",
+            "cluster_tolerance": "0.5",
+            "min_cluster_size": "100",
+            "max_cluster_size": "2000",
             "camera_optical_frame": "zed_left_camera_optical_frame",
             "target_frame": "map",
         }.items(),
@@ -119,9 +119,7 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
         ),
         launch_arguments={
             "yaml_filename": (
-                office_map_file_path
-                if environment == "office"
-                else bathroom_map_file_path
+                office_map_file_path if environment == "office" else bathroom_map_file_path
             ),
             "auto_activate": "True",
         }.items(),
@@ -147,7 +145,11 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
         arguments=[
             "-d",
             PathJoinSubstitution(
-                [FindPackageShare("camera_lidar_perception_bringup"), "rviz", "rviz_config.rviz"]
+                [
+                    FindPackageShare("camera_lidar_perception_bringup"),
+                    "rviz",
+                    "rviz_config.rviz",
+                ]
             ),
         ],
         condition=IfCondition(LaunchConfiguration("visualize")),
@@ -167,7 +169,7 @@ def generate_launch_description():
     launch_args = [
         DeclareLaunchArgument(
             "map_environment",
-            default_value="office",
+            default_value="bathroom",
             choices=["office", "bathroom"],
             description="Which environment map to load (office or bathroom)",
         ),
