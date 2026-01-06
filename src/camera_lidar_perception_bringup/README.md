@@ -7,14 +7,12 @@ Launch and configuration package for bringing up a camera–LiDAR perception pip
 This package provides:
 
 - A bringup launch that starts a multi-threaded rclcpp component container for perception.
-- A Nav2 map server launch for static map loading.
-- Ready-to-use maps and an RViz configuration.
+- Foxglove layout configuration in JSON format to import into foxglove studio app.
 
 Key dependencies (declared in package.xml):
 
 - ament_cmake
 - camera_lidar_3d_perception
-- nav2_map_server
 - yolo11_inference
 
 ## Launch files
@@ -22,32 +20,14 @@ Key dependencies (declared in package.xml):
 - launch/camera_lidar_perception_bringup.launch.py
 
   - Starts rclcpp_components: component_container_mt.
-  - Optional visualization via RViz.
-- launch/nav2_map_server.launch.py
-
-  - Starts nav2_map_server: map_server.
-  - Supports auto activation and custom map YAML.
+  - Optional visualization via Foxglove.
 
 ## Launch arguments
 
 camera_lidar_perception_bringup.launch.py:
 
-- map_environment: Selects a bundled map environment (e.g., bathroom, office).
-- visualize: true|false to start RViz with the provided config.
+- visualize: true|false to start Foxglove bridge with the provided config.
 
-nav2_map_server.launch.py:
-
-- yaml_filename: Path to a .yaml map (overrides map_environment).
-- auto_activate: true|false to auto-activate the map server lifecycle node.
-
-Note: Available map_environment values match the directories under maps/ (bathroom, office).
-
-## Maps
-
-Bundled maps:
-
-- maps/bathroom/bathroom.yaml (+ .pgm)
-- maps/office/office.yaml (+ .pgm)
 
 ## RViz
 
@@ -55,35 +35,12 @@ RViz config:
 
 - rviz/rviz_config.rviz
 
+## Foxglove Studio
+
+- foxglove/foxglove_layout.json
+
 Enable with visualize:=true on the bringup launch.
 
-## Examples
+## Examples Usage
 
-- ros2 launch camera_lidar_perception_bringup camera_lidar_perception_bringup.launch.py map_environment:=bathroom visualize:=true
-
-## Occupancy Grid Generator
-
-This package includes ocp_generator.py, a helper node that projects the top surfaces of 3D detections onto the Occupancy Grid Map and saves the result as a PNG image.
-
-### Usage:
-
-```bash
-ros2 run camera_lidar_perception_bringup ocp_generator.py --ros-args -p output_dir:=<output_directory>
-```
-
-```bash
-ros2 service call /render_bbox_occupancy_grid std_srvs/srv/Trigger {}
-```
-
-### Inputs:
-
-- Subscribes: /detections_3d (vision_msgs/Detection3DArray, in map frame)
-- Uses map from: /nav2/map_server/map
-
-### Behavior:
-
-- Accumulates detections over time
-- Selects best box per class (highest score)
-- Prevents overlapping boxes
-- Saves rendered occupancy grid with boxes as PNG
-- Generate JSON of rendered detections
+- ros2 launch camera_lidar_perception_bringup camera_lidar_perception_bringup.launch.py visualize:=true

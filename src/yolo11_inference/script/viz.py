@@ -6,28 +6,39 @@ import cv2
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
-from sensor_msgs.msg import CompressedImage
+from sensor_msgs.msg import CompressedImage, Image
 from cv_bridge import CvBridge
 from vision_msgs.msg import Detection2DArray
 from typing import Optional
 import time
+
 
 class Detection2DOverlay(Node):
     def __init__(self):
         super().__init__("detection2d_overlay")
 
         # ---- Parameters
-        self.declare_parameter("image_topic", "/zed/zed_node/rgb/image_rect_color/compressed")
-        self.declare_parameter("detection_topic", "/yolo11_inference/detections")
+        self.declare_parameter(
+            "image_topic", "/carla/ego_vehicle/zedx_one_gs/image"
+        )
+        self.declare_parameter("detection_topic", "detections")
         self.declare_parameter("output_image_topic", "detection2d_overlay")
         self.declare_parameter("show_window", False)
-        self.declare_parameter("max_det_age_sec", 0.5)   # how old detections can be
-        self.declare_parameter("log_every_n", 30)        # reduce log spam
+        self.declare_parameter("max_det_age_sec", 0.5)  # how old detections can be
+        self.declare_parameter("log_every_n", 30)  # reduce log spam
 
-        image_topic = self.get_parameter("image_topic").get_parameter_value().string_value
-        detection_topic = self.get_parameter("detection_topic").get_parameter_value().string_value
-        self.output_topic = self.get_parameter("output_image_topic").get_parameter_value().string_value
-        self.show_window = self.get_parameter("show_window").get_parameter_value().bool_value
+        image_topic = (
+            self.get_parameter("image_topic").get_parameter_value().string_value
+        )
+        detection_topic = (
+            self.get_parameter("detection_topic").get_parameter_value().string_value
+        )
+        self.output_topic = (
+            self.get_parameter("output_image_topic").get_parameter_value().string_value
+        )
+        self.show_window = (
+            self.get_parameter("show_window").get_parameter_value().bool_value
+        )
         self.max_det_age = float(self.get_parameter("max_det_age_sec").value)
         self.log_every_n = int(self.get_parameter("log_every_n").value)
 
@@ -52,14 +63,14 @@ class Detection2DOverlay(Node):
 
         # ---- Subscriptions
         self.img_sub = self.create_subscription(
-            CompressedImage, image_topic, self.image_cb, img_qos
+            Image, image_topic, self.image_cb, img_qos
         )
         self.det_sub = self.create_subscription(
             Detection2DArray, detection_topic, self.det_cb, det_qos
         )
 
         # ---- Publisher
-        self.pub_img = self.create_publisher(CompressedImage, self.output_topic, img_qos)
+        self.pub_img = self.create_publisher(Image, self.output_topic, img_qos)
 
         self.get_logger().info(
             f"Listening:\n  image:      {image_topic}\n  detections: {detection_topic}\n"
@@ -72,10 +83,11 @@ class Detection2DOverlay(Node):
         self.last_det_msg = det_msg
         self.last_det_walltime = time.time()
 
-    def image_cb(self, img_msg: CompressedImage):
+    def image_cb(self, img_msg: Image):
         # Convert image
         try:
-            frame = self.bridge.compressed_imgmsg_to_cv2(img_msg, desired_encoding="bgr8")
+            # frame = self.bridge.compressed_imgmsg_to_cv2(img_msg, desired_encoding="bgr8")
+            frame = self.bridge.imgmsg_to_cv2(img_msg, desired_encoding="bgr8")
         except Exception as e:
             self.get_logger().warn(f"cv_bridge compressed->cv2 failed: {e}")
             return
@@ -84,12 +96,15 @@ class Detection2DOverlay(Node):
 
         # Draw if we have recent detections
         num_drawn = 0
-        if self.last_det_msg is not None and (time.time() - self.last_det_walltime) <= self.max_det_age:
+        if (
+            self.last_det_msg is not None
+            and (time.time() - self.last_det_walltime) <= self.max_det_age
+        ):
             num_drawn = self.draw_detections(overlay, self.last_det_msg)
 
         # Publish annotated image
         try:
-            out_msg = self.bridge.cv2_to_compressed_imgmsg(overlay, dst_format="jpg")
+            out_msg = self.bridge.cv2_to_imgmsg(overlay, encoding="bgr8")
         except Exception as e:
             self.get_logger().warn(f"cv2->compressed msg failed: {e}")
             return
@@ -101,7 +116,9 @@ class Detection2DOverlay(Node):
 
         # Throttled log
         if self.pub_count % self.log_every_n == 0:
-            self.get_logger().info(f"Published {self.pub_count} frames, last boxes drawn: {num_drawn}")
+            self.get_logger().info(
+                f"Published {self.pub_count} frames, last boxes drawn: {num_drawn}"
+            )
 
         # Optional preview
         if self.show_window:
@@ -151,12 +168,24 @@ class Detection2DOverlay(Node):
             if score is not None and not math.isnan(score):
                 caption += f" {score:.2f}"
 
-            (tw, th), baseline = cv2.getTextSize(caption, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
+            (tw, th), baseline = cv2.getTextSize(
+                caption, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1
+            )
             tb_x1, tb_y1 = x1, max(0, y1 - th - baseline - 3)
             tb_x2, tb_y2 = x1 + tw + 4, y1
-            cv2.rectangle(image, (tb_x1, tb_y1), (tb_x2, tb_y2), (0, 255, 0), thickness=-1)
-            cv2.putText(image, caption, (x1 + 2, y1 - 3),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, cv2.LINE_AA)
+            cv2.rectangle(
+                image, (tb_x1, tb_y1), (tb_x2, tb_y2), (0, 255, 0), thickness=-1
+            )
+            cv2.putText(
+                image,
+                caption,
+                (x1 + 2, y1 - 3),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.5,
+                (0, 0, 0),
+                1,
+                cv2.LINE_AA,
+            )
             drawn += 1
         return drawn
 
@@ -168,6 +197,7 @@ class Detection2DOverlay(Node):
                 pass
         return super().destroy_node()
 
+
 def main():
     rclpy.init()
     node = Detection2DOverlay()
@@ -178,6 +208,7 @@ def main():
     finally:
         node.destroy_node()
         rclpy.shutdown()
+
 
 if __name__ == "__main__":
     main()

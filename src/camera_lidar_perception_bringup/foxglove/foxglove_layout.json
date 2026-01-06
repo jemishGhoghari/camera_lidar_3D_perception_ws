@@ -1,0 +1,247 @@
+{
+  "configById": {
+    "Tab!34ymhbu": {
+      "activeTabIdx": 0,
+      "tabs": [
+        {
+          "title": "Scene",
+          "layout": {
+            "first": "3D!dhx4jh",
+            "second": {
+              "first": "Image!3dkmq8l",
+              "second": "Image!2w6pism",
+              "direction": "row"
+            },
+            "direction": "row"
+          }
+        },
+        {
+          "title": "Transforms",
+          "layout": "TransformTree!4dz8sce"
+        }
+      ]
+    },
+    "3D!dhx4jh": {
+      "topics": {
+        "/carla/ego_vehicle/lidar": {
+          "visible": true,
+          "colorField": "intensity",
+          "colorMode": "colormap",
+          "colorMap": "turbo"
+        },
+        "/carla/ego_vehicle/radar_front": {
+          "visible": false,
+          "colorField": "z",
+          "colorMode": "colormap",
+          "colorMap": "turbo"
+        },
+        "/carla/ego_vehicle/semantic_lidar": {
+          "visible": false,
+          "colorField": "z",
+          "colorMode": "colormap",
+          "colorMap": "turbo"
+        },
+        "/carla/ego_vehicle/dvs_front/events": {
+          "visible": false,
+          "colorField": "x",
+          "colorMode": "colormap",
+          "colorMap": "turbo"
+        },
+        "/move_base_simple/goal": {
+          "visible": false
+        },
+        "/carla/markers": {
+          "visible": false
+        },
+        "/carla/ego_vehicle/livox_mid360": {
+          "visible": true,
+          "colorField": "intensity",
+          "colorMode": "colormap",
+          "colorMap": "turbo"
+        },
+        "/carla/ego_vehicle/rgb_view/image": {
+          "visible": false,
+          "frameLocked": true,
+          "cameraInfoTopic": "/carla/ego_vehicle/rgb_view/camera_info",
+          "distance": 1,
+          "planarProjectionFactor": 0,
+          "color": "#ffffff",
+          "rectifyImage": true,
+          "renderAsPointCloud": false,
+          "pointSize": 1.5
+        },
+        "/detection_markers": {
+          "visible": true
+        },
+        "/detection2d_overlay": {
+          "visible": false,
+          "cameraInfoTopic": "/carla/ego_vehicle/zedx_one_gs/camera_info"
+        }
+      },
+      "layers": {
+        "e0069f84-829e-44ea-a273-9b0c60d1a9eb": {
+          "layerId": "foxglove.Grid",
+          "instanceId": "e0069f84-829e-44ea-a273-9b0c60d1a9eb"
+        }
+      },
+      "cameraState": {
+        "perspective": true,
+        "distance": 38.960374867737904,
+        "phi": 2.4942836262715335,
+        "thetaOffset": 88.94634021521505,
+        "targetOffset": [
+          7.45613546785493,
+          -5.746944568952807,
+          3.408182566527537e-16
+        ],
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "targetOrientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "fovy": 45,
+        "near": 0.5,
+        "far": 5000
+      },
+      "followMode": "follow-pose",
+      "followTf": "ego_vehicle",
+      "locationFixTopic": "/carla/ego_vehicle/gnss",
+      "scene": {},
+      "transforms": {},
+      "publish": {
+        "type": "point",
+        "poseTopic": "/move_base_simple/goal",
+        "pointTopic": "/clicked_point",
+        "poseEstimateTopic": "/initialpose",
+        "poseEstimateXDeviation": 0.5,
+        "poseEstimateYDeviation": 0.5,
+        "poseEstimateThetaDeviation": 0.26179939
+      },
+      "imageMode": {}
+    },
+    "Image!3dkmq8l": {
+      "imageMode": {
+        "imageTopic": "/detection2d_overlay",
+        "calibrationTopic": "/carla/ego_vehicle/zedx_one_gs/camera_info"
+      },
+      "cameraState": {
+        "distance": 20,
+        "perspective": true,
+        "phi": 60,
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "targetOffset": [
+          0,
+          0,
+          0
+        ],
+        "targetOrientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "thetaOffset": 45,
+        "fovy": 45,
+        "near": 0.5,
+        "far": 5000
+      },
+      "followMode": "follow-pose",
+      "scene": {},
+      "transforms": {},
+      "topics": {},
+      "layers": {},
+      "publish": {
+        "type": "point",
+        "poseTopic": "/move_base_simple/goal",
+        "pointTopic": "/clicked_point",
+        "poseEstimateTopic": "/initialpose",
+        "poseEstimateXDeviation": 0.5,
+        "poseEstimateYDeviation": 0.5,
+        "poseEstimateThetaDeviation": 0.26179939
+      }
+    },
+    "Image!2w6pism": {
+      "imageMode": {
+        "imageTopic": "/carla/ego_vehicle/zedx_one_gs/image",
+        "calibrationTopic": "/carla/ego_vehicle/zedx_one_gs/camera_info"
+      },
+      "cameraState": {
+        "distance": 20,
+        "perspective": true,
+        "phi": 60,
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "targetOffset": [
+          0,
+          0,
+          0
+        ],
+        "targetOrientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "thetaOffset": 45,
+        "fovy": 45,
+        "near": 0.5,
+        "far": 5000
+      },
+      "followMode": "follow-pose",
+      "scene": {},
+      "transforms": {},
+      "topics": {},
+      "layers": {},
+      "publish": {
+        "type": "point",
+        "poseTopic": "/move_base_simple/goal",
+        "pointTopic": "/clicked_point",
+        "poseEstimateTopic": "/initialpose",
+        "poseEstimateXDeviation": 0.5,
+        "poseEstimateYDeviation": 0.5,
+        "poseEstimateThetaDeviation": 0.26179939
+      }
+    },
+    "TransformTree!4dz8sce": {},
+    "RawMessages!3fkh76v": {
+      "diffEnabled": false,
+      "diffMethod": "custom",
+      "diffTopicPath": "",
+      "showFullMessageForDiff": false,
+      "topicPath": "/carla/ego_vehicle/zedx_one_gs/image",
+      "fontSize": 12
+    },
+    "Tab!2lhqenb": {
+      "activeTabIdx": 0,
+      "tabs": [
+        {
+          "title": "Overview",
+          "layout": "Tab!34ymhbu"
+        },
+        {
+          "title": "",
+          "layout": "RawMessages!3fkh76v"
+        }
+      ]
+    }
+  },
+  "layout": "Tab!2lhqenb",
+  "globalVariables": {},
+  "playbackConfig": {
+    "speed": 1
+  },
+  "userNodes": {}
+}

@@ -5,8 +5,8 @@ namespace yolo11_inference
 
 Yolo11InferenceNode::Yolo11InferenceNode(const rclcpp::NodeOptions& options) : Node("yolo11_inference_node", options)
 {
-  yolo_config_.networkInputWidth = this->declare_parameter<int>("network_image_width", 640);
-  yolo_config_.networkInputHeight = this->declare_parameter<int>("network_image_height", 640);
+  yolo_config_.networkInputWidth = this->declare_parameter<int>("network_image_width", 1280);
+  yolo_config_.networkInputHeight = this->declare_parameter<int>("network_image_height", 1280);
   yolo_config_.modelPath = this->declare_parameter<std::string>("model_file_path", "");
   yolo_config_.confThreshold = this->declare_parameter<float>("confidence_threshold", 0.25f);
   yolo_config_.nmsThreshold = this->declare_parameter<float>("nms_threshold", 0.45f);
@@ -19,10 +19,10 @@ Yolo11InferenceNode::Yolo11InferenceNode(const rclcpp::NodeOptions& options) : N
   inference_engine_ = std::make_unique<Yolo11DNNInference>(yolo_config_, class_names_, this->get_logger());
 
   // Publishers
-  detection_pub_ = this->create_publisher<vision_msgs::msg::Detection2DArray>("detections", 10);
+  detection_pub_ = this->create_publisher<vision_msgs::msg::Detection2DArray>("detections", 50);
 
   // Subscribers
-  image_sub_ = this->create_subscription<sensor_msgs::msg::CompressedImage>(
+  image_sub_ = this->create_subscription<sensor_msgs::msg::Image>(
       "image_raw", rclcpp::SensorDataQoS(),
       std::bind(&Yolo11InferenceNode::imageCallback, this, std::placeholders::_1));
 
@@ -33,11 +33,26 @@ Yolo11InferenceNode::~Yolo11InferenceNode()
 {
 }
 
-void Yolo11InferenceNode::imageCallback(const sensor_msgs::msg::CompressedImage::ConstSharedPtr& msg)
+void Yolo11InferenceNode::imageCallback(const sensor_msgs::msg::Image::ConstSharedPtr& msg)
 {
-  // Decode JPEG/PNG
-  cv::Mat buf(1, static_cast<int>(msg->data.size()), CV_8UC1, const_cast<uint8_t*>(msg->data.data()));
-  cv::Mat frame = cv::imdecode(buf, cv::IMREAD_COLOR);
+  // cv::Mat buf(1, static_cast<int>(msg->data.size()), CV_8UC1, const_cast<uint8_t*>(msg->data.data()));
+  // cv::Mat frame = cv::imdecode(buf, cv::IMREAD_COLOR);
+
+  cv::Mat frame;
+  try
+  {
+    frame = cv_bridge::toCvShare(msg, msg->encoding)->image;
+    if (frame.channels() == 4)
+    {
+      cv::cvtColor(frame, frame, cv::COLOR_BGRA2BGR);
+    }
+  }
+  catch (cv_bridge::Exception& e)
+  {
+    RCLCPP_ERROR(this->get_logger(), "cv_bridge exception: %s", e.what());
+    return;
+  }
+
   if (frame.empty())
   {
     RCLCPP_WARN(get_logger(), "Failed to decode CompressedImage");

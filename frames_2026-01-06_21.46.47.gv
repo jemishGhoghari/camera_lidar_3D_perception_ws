@@ -1,0 +1,13 @@
+digraph G {
+"ego_vehicle" -> "ego_vehicle/livox_mid360"[label=" Broadcaster: default_authority\nAverage rate: 22.0\nBuffer length: 0.5\nMost recent transform: 70.257631\nOldest transform: 69.757631\n"];
+"map" -> "ego_vehicle"[label=" Broadcaster: default_authority\nAverage rate: 22.222\nBuffer length: 0.45\nMost recent transform: 70.207631\nOldest transform: 69.757631\n"];
+"ego_vehicle" -> "ego_vehicle/zedx_one_gs"[label=" Broadcaster: default_authority\nAverage rate: 22.222\nBuffer length: 0.45\nMost recent transform: 70.207631\nOldest transform: 69.757631\n"];
+"ego_vehicle" -> "ego_vehicle/rgb_view"[label=" Broadcaster: default_authority\nAverage rate: 22.222\nBuffer length: 0.45\nMost recent transform: 70.207631\nOldest transform: 69.757631\n"];
+"ego_vehicle" -> "ego_vehicle/radar_front"[label=" Broadcaster: default_authority\nAverage rate: 22.222\nBuffer length: 0.45\nMost recent transform: 70.207631\nOldest transform: 69.757631\n"];
+"ego_vehicle" -> "ego_vehicle/gnss"[label=" Broadcaster: default_authority\nAverage rate: 22.222\nBuffer length: 0.45\nMost recent transform: 70.207631\nOldest transform: 69.757631\n"];
+"ego_vehicle" -> "ego_vehicle/imu"[label=" Broadcaster: default_authority\nAverage rate: 22.222\nBuffer length: 0.45\nMost recent transform: 70.207631\nOldest transform: 69.757631\n"];
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 1767732407.1317189"[ shape=plaintext ] ;
+}->"map";
+}

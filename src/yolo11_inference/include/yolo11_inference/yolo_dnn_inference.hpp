@@ -108,40 +108,102 @@ static std::vector<std::string> loadCOCOClasses()
 static cv::Mat toNxC(const cv::Mat& out3d)
 {
   CV_Assert(out3d.dims >= 2);
+
   if (out3d.dims == 2)
   {
-    // Already (N x C)
+    // Already 2D - need to determine if it's (N, C) or (C, N)
+    // Heuristic: C (features) is typically smaller than N (detections)
+    // and C is usually in range [4, 1000] for most detection models
+    if (out3d.rows < out3d.cols && out3d.rows >= 4 && out3d.rows <= 1000)
+    {
+      // Likely (C, N) -> transpose to (N, C)
+      return out3d.t();
+    }
+    // Assume already (N, C)
     return out3d;
   }
-  CV_Assert(out3d.dims == 3 && out3d.size[0] == 1);
+
+  CV_Assert(out3d.dims == 3);
+
+  // For 3D tensors, we need to handle various formats:
+  // - (1, C, N) - batch, features, detections
+  // - (1, N, C) - batch, detections, features
+  // - (B, C, N) - multi-batch
+
+  const int d0 = out3d.size[0];  // batch
   const int d1 = out3d.size[1];
   const int d2 = out3d.size[2];
 
-  const bool d1_is_C = (d1 <= 512);
-  const bool d2_is_C = (d2 <= 512);
+  // If batch dimension is 1, we can squeeze it
+  if (d0 == 1)
+  {
+    // Squeeze batch dimension: (1, d1, d2) -> (d1, d2)
+    cv::Mat squeezed = out3d.reshape(1, { d1, d2 });
 
-  if (d1_is_C && !d2_is_C)
-  {
-    // (1, C, N) -> (C x N) -> (N x C)
-    cv::Mat cxn = out3d.reshape(1, d1);
-    return cxn.t();
-  }
-  else if (!d1_is_C && d2_is_C)
-  {
-    // (1, N, C) -> (N x C)
-    return out3d.reshape(1, d1);
-  }
-  else
-  {
-    // Ambiguous -> pick the smaller as C
-    if (d1 <= d2)
+    // Now determine orientation of (d1, d2)
+    // C (features) should be smaller and typically in [4, 1000]
+    const bool d1_is_C = (d1 < d2) && (d1 >= 4) && (d1 <= 1000);
+    const bool d2_is_C = (d2 < d1) && (d2 >= 4) && (d2 <= 1000);
+
+    if (d1_is_C && !d2_is_C)
     {
-      cv::Mat cxn = out3d.reshape(1, d1);
-      return cxn.t();
+      // (C, N) -> (N, C)
+      return squeezed.t();
+    }
+    else if (d2_is_C && !d1_is_C)
+    {
+      // Already (N, C)
+      return squeezed;
     }
     else
     {
-      return out3d.reshape(1, d1);
+      // Ambiguous case - use the smaller dimension as C
+      // This is a reasonable fallback for most detection models
+      if (d1 < d2)
+      {
+        // (C, N) -> (N, C)
+        return squeezed.t();
+      }
+      else
+      {
+        // Already (N, C)
+        return squeezed;
+      }
+    }
+  }
+  else
+  {
+    // Multi-batch case: flatten batch into N
+    // Assuming format is (B, C, N) or (B, N, C)
+
+    const bool d1_is_C = (d1 < d2) && (d1 >= 4) && (d1 <= 1000);
+    const bool d2_is_C = (d2 < d1) && (d2 >= 4) && (d2 <= 1000);
+
+    if (d1_is_C && !d2_is_C)
+    {
+      // (B, C, N) -> flatten to (B*N, C)
+      cv::Mat reshaped = out3d.reshape(1, { d1, d0 * d2 });  // (C, B*N)
+      return reshaped.t();                                   // (B*N, C)
+    }
+    else if (d2_is_C && !d1_is_C)
+    {
+      // (B, N, C) -> flatten to (B*N, C)
+      return out3d.reshape(1, { d0 * d1, d2 });
+    }
+    else
+    {
+      // Fallback: assume smaller dimension is C
+      if (d1 < d2)
+      {
+        // Treat as (B, C, N)
+        cv::Mat reshaped = out3d.reshape(1, { d1, d0 * d2 });
+        return reshaped.t();
+      }
+      else
+      {
+        // Treat as (B, N, C)
+        return out3d.reshape(1, { d0 * d1, d2 });
+      }
     }
   }
 }

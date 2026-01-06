@@ -15,6 +15,7 @@
 #include <vision_msgs/msg/object_hypothesis_with_pose.hpp>
 
 #include <sensor_msgs/msg/image.hpp>
+#include <sensor_msgs/msg/compressed_image.hpp>
 
 #include "yolo_dnn_inference.hpp"
 
@@ -43,16 +44,16 @@ public:
 
 private:
   /**
- * @brief 
+   * @brief
    * @param msg Incoming compressed image message.
    */
-  void imageCallback(const sensor_msgs::msg::CompressedImage::ConstSharedPtr& msg);
+  void imageCallback(const sensor_msgs::msg::Image::ConstSharedPtr& msg);
 
   /// YOLOv11 DNN inference engine instance.
   std::unique_ptr<Yolo11DNNInference> inference_engine_;
 
   /// Subscriber for compressed image input.
-  rclcpp::Subscription<sensor_msgs::msg::CompressedImage>::SharedPtr image_sub_;
+  rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr image_sub_;
 
   /// Publisher for 2D detection results.
   rclcpp::Publisher<vision_msgs::msg::Detection2DArray>::SharedPtr detection_pub_;

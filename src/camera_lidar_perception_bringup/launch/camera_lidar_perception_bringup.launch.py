@@ -9,8 +9,6 @@ from launch.actions import (
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import (
-    Command,
-    FindExecutable,
     LaunchConfiguration,
     PathJoinSubstitution,
 )
@@ -20,7 +18,6 @@ from launch_xml.launch_description_sources import XMLLaunchDescriptionSource
 
 
 def launch_setup(context: LaunchContext, *args, **kwargs):
-    environment = context.perform_substitution(LaunchConfiguration("map_environment"))
 
     component_container = Node(
         package="rclcpp_components",
@@ -39,24 +36,6 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
         ]
     )
 
-    office_map_file_path = PathJoinSubstitution(
-        [
-            FindPackageShare("camera_lidar_perception_bringup"),
-            "maps",
-            "office",
-            "office.yaml",
-        ]
-    )
-
-    bathroom_map_file_path = PathJoinSubstitution(
-        [
-            FindPackageShare("camera_lidar_perception_bringup"),
-            "maps",
-            "bathroom",
-            "bathroom.yaml",
-        ]
-    )
-
     launch_yolo11_detection_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             PathJoinSubstitution(
@@ -70,13 +49,13 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
         launch_arguments={
             "component_container_name": "camera_lidar_perception_container",
             "standalone": "False",
-            "image_input_topic": "/zed/zed_node/rgb/image_rect_color/compressed",
+            "image_input_topic": "/carla/ego_vehicle/zedx_one_gs/image",
             "detections_output_topic": "/detections",
             "network_image_width": "1280",
             "network_image_height": "736",
             "model_file_path": model_file_path,
-            "confidence_threshold": "0.4",
-            "nms_threshold": "0.4",
+            "confidence_threshold": "0.55",
+            "nms_threshold": "0.45",
             "use_cuda": "True",
         }.items(),
     )
@@ -94,36 +73,17 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
         launch_arguments={
             "component_container_name": "camera_lidar_perception_container",
             "standalone": "False",
-            "pointcloud_topic": "/livox/lidar",
-            "camera_info_topic": "/zed/zed_node/rgb/camera_info",
+            "pointcloud_topic": "/carla/ego_vehicle/livox_mid360",
+            "camera_info_topic": "/carla/ego_vehicle/zedx_one_gs/camera_info",
             "detection_2d_input_topic": "detections",
             "detections_3d_output_topic": "/detections_3d",
-            "voxel_leaf_size": "0.01",
-            "cluster_tolerance": "0.5",
-            "min_cluster_size": "100",
-            "max_cluster_size": "2000",
-            "camera_optical_frame": "zed_left_camera_optical_frame",
+            "voxel_leaf_size": "0.1",
+            "cluster_tolerance": "0.2",
+            "min_cluster_size": "1",
+            "max_cluster_size": "25000",
+            "camera_optical_frame": "ego_vehicle/zedx_one_gs",
             "target_frame": "map",
         }.items(),
-    )
-
-    launch_nav2_map_server_node = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            PathJoinSubstitution(
-                [
-                    FindPackageShare("camera_lidar_perception_bringup"),
-                    "launch",
-                    "nav2_map_server.launch.py",
-                ]
-            ),
-        ),
-        launch_arguments={
-            "yaml_filename": (
-                office_map_file_path if environment == "office" else bathroom_map_file_path
-            ),
-            "auto_activate": "True",
-        }.items(),
-        condition=IfCondition(LaunchConfiguration("visualize")),
     )
 
     launch_foxglove_bridge = IncludeLaunchDescription(
@@ -139,40 +99,16 @@ def launch_setup(context: LaunchContext, *args, **kwargs):
         condition=IfCondition(LaunchConfiguration("visualize")),
     )
 
-    rviz2_node = Node(
-        package="rviz2",
-        executable="rviz2",
-        arguments=[
-            "-d",
-            PathJoinSubstitution(
-                [
-                    FindPackageShare("camera_lidar_perception_bringup"),
-                    "rviz",
-                    "rviz_config.rviz",
-                ]
-            ),
-        ],
-        condition=IfCondition(LaunchConfiguration("visualize")),
-    )
-
     return [
         component_container,
         launch_yolo11_detection_node,
         launch_camera_lidar_3d_detection_node,
-        launch_nav2_map_server_node,
-        # launch_foxglove_bridge,
-        rviz2_node,
+        launch_foxglove_bridge,
     ]
 
 
 def generate_launch_description():
     launch_args = [
-        DeclareLaunchArgument(
-            "map_environment",
-            default_value="bathroom",
-            choices=["office", "bathroom"],
-            description="Which environment map to load (office or bathroom)",
-        ),
         DeclareLaunchArgument(
             "visualize",
             default_value="true",
