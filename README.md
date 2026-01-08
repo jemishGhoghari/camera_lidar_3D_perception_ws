@@ -84,15 +84,6 @@ sudo sed -i -e '/experimental/ s/^#//g' /etc/apt/sources.list.d/nvidia-container
 sudo apt-get update
 ```
 
-```bash
-export NVIDIA_CONTAINER_TOOLKIT_VERSION=1.18.0-1
-  sudo apt-get install -y \
-      nvidia-container-toolkit=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
-      nvidia-container-toolkit-base=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
-      libnvidia-container-tools=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
-      libnvidia-container1=${NVIDIA_CONTAINER_TOOLKIT_VERSION}
-```
-
 ### Installation
 
 #### Isaac ROS Development Environment
